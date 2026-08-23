@@ -17,9 +17,7 @@ public class QuestService {
     }
 
     public Quest createQuest(String title, String detail) {
-        Quest quest = new Quest();
-        quest.setTitle(title);
-        quest.setDetail(detail);
+        Quest quest = Quest.builder().title(title).detail(detail).build();
 
         return questRepository.save(quest);
     }
@@ -41,8 +39,7 @@ public class QuestService {
     public Quest updateQuest(Long id, String title, String detail) {
         Quest quest = getQuest(id);
 
-        quest.setTitle(title);
-        quest.setDetail(detail);
+        quest.update(title, detail);
 
         return quest;
     }
