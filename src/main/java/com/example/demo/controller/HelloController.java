@@ -72,4 +72,10 @@ public class HelloController {
     ) {
         return questService.updateQuest(id, request.title, request.detail);
     }
+
+    @PatchMapping("/api/quests/{id}/complete")
+    public String completeQuest(@PathVariable Long id) {
+        questService.completeQuest(id);
+        return id + " 완료 처리";
+    }
 }

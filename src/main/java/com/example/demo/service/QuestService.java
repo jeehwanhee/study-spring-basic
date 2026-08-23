@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.domain.Quest;
 import com.example.demo.domain.QuestRepository;
+import com.example.demo.exception.BusinessException;
+import com.example.demo.exception.QuestErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ public class QuestService {
     }
 
     public Quest getQuest(Long id) {
-        return questRepository.findById(id).orElseThrow(()->new IllegalArgumentException("해당 퀘스트를 찾을 수 없습니다."+id));
+        return questRepository.findById(id).orElseThrow(()->new BusinessException(QuestErrorCode.QUEST_NOT_FOUND));
     }
 
     public void deleteQuest(Long id) {
@@ -42,5 +44,11 @@ public class QuestService {
         quest.update(title, detail);
 
         return quest;
+    }
+
+    @Transactional
+    public void completeQuest(Long id) {
+        Quest quest = getQuest(id);
+        quest.complete();
     }
 }
