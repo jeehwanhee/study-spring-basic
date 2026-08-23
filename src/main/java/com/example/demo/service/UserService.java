@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserRepository;
+import com.example.demo.exception.BusinessException;
+import com.example.demo.exception.UserErrorCode;
 import com.example.demo.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,7 @@ public class UserService {
 
     public String signup(String username, String password) {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("이미 사용중인 아이디");
+            throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);
         }
 
         User user = new User();
@@ -38,10 +40,10 @@ public class UserService {
 
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("미가입 아이디"));
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호 불일치");
+            throw new BusinessException(UserErrorCode.PASSWORD_MISMATCH);
         }
 
         return jwtUtil.createToken(user.getUsername());
