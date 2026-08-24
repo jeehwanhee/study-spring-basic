@@ -7,8 +7,10 @@ import com.example.demo.exception.UserErrorCode;
 import com.example.demo.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -21,6 +23,7 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    @Transactional
     public String signup(String username, String password) {
         if (userRepository.existsByUsername(username)) {
             throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);

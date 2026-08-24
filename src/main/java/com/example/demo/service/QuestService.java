@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class QuestService {
 
     private final QuestRepository questRepository;
@@ -18,6 +19,7 @@ public class QuestService {
         this.questRepository = questRepository;
     }
 
+    @Transactional
     public Quest createQuest(String title, String detail) {
         Quest quest = Quest.builder().title(title).detail(detail).build();
 
@@ -32,6 +34,7 @@ public class QuestService {
         return questRepository.findById(id).orElseThrow(()->new BusinessException(QuestErrorCode.QUEST_NOT_FOUND));
     }
 
+    @Transactional
     public void deleteQuest(Long id) {
         Quest quest = getQuest(id);
         questRepository.delete(quest);
