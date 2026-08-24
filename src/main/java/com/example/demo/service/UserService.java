@@ -26,13 +26,10 @@ public class UserService {
             throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);
         }
 
-        User user = new User();
-        user.setUsername(username);
-
-        String encryptedPassword = passwordEncoder.encode(password);
-        user.setPassword(encryptedPassword);
-
-        user.setRole("USER");
+        User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .build();
 
         userRepository.save(user);
         return "회원가입 완료";
