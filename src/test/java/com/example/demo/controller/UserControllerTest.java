@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.service.UserService;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class UserControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    UserService userService;
+
     @Test
     void signup() throws Exception {
         mockMvc.perform(post("/api/signup")
@@ -33,7 +37,34 @@ public class UserControllerTest {
                         """))
                 .andExpect(status().isOk())
                 .andDo(document("signup"));
+    }
 
+    @Test
+    void loginSuccess() throws Exception {
+        userService.signup("testLogin", "test1!");
+
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {"username":"testLogin",
+                        "password":"test1!"}
+                        """))
+                .andExpect(status().isOk())
+                .andDo(document("login-success"));
+    }
+
+    @Test
+    void loginFail_wrongPassword() throws Exception {
+        userService.signup("testLogin", "test1!");
+
+        mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"username":"testLogin",
+                        "password":"test1!wrong"}
+                        """))
+                .andExpect(status().isUnauthorized())
+                .andDo(document("login-fail"));
     }
 
 }
