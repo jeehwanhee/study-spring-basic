@@ -50,8 +50,8 @@ public class QuestService {
     }
 
     @Transactional
-    public void completeQuest(Long id) {
+    public void completeQuest(Long id, String proofImageUrl) {
         Quest quest = getQuest(id);
-        quest.complete();
+        quest.complete(proofImageUrl);
     }
 }

@@ -4,19 +4,24 @@ import com.example.demo.domain.Quest;
 import com.example.demo.domain.QuestRepository;
 import com.example.demo.dto.QuestRequest;
 import com.example.demo.dto.QuestResponse;
+import com.example.demo.service.FileStorageService;
 import com.example.demo.service.QuestService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 public class HelloController {
 
     private final QuestService questService;
+    private final FileStorageService fileStorageService;
 
-    public HelloController(QuestService questService) {
+    public HelloController(QuestService questService, FileStorageService fileStorageService) {
         this.questService = questService;
+        this.fileStorageService = fileStorageService;
     }
 
 //    @GetMapping("/api/hello")
@@ -74,8 +79,12 @@ public class HelloController {
     }
 
     @PatchMapping("/api/quests/{id}/complete")
-    public String completeQuest(@PathVariable Long id) {
-        questService.completeQuest(id);
+    public String completeQuest(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        String storedUrl = fileStorageService.store(file);
+        questService.completeQuest(id, storedUrl);
         return id + " 완료 처리";
     }
 }

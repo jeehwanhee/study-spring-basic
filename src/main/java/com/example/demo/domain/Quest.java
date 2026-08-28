@@ -19,6 +19,7 @@ public class Quest {
     private String title;
     private String detail;
     private boolean completed;
+    private String proofImageUrl;
 
     @Builder
     public Quest(String title, String detail) {
@@ -45,9 +46,13 @@ public class Quest {
         this.detail = detail;
     }
 
-    public void complete() {
+    public void complete(String proofImageUrl) {
         if (completed)
             throw new BusinessException(QuestErrorCode.ALREADY_COMPLETED);
+        if (proofImageUrl == null || proofImageUrl.isBlank())
+            throw new BusinessException(QuestErrorCode.PROOF_IMAGE_REQUIRED);
+
         completed = true;
+        this.proofImageUrl = proofImageUrl;
     }
 }
