@@ -3,6 +3,7 @@ package com.example.demo.config;
 import com.example.demo.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,27 +24,66 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/signup", "/api/login").permitAll()
                         .anyRequest().authenticated()
-                )
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
                 .formLogin(form -> form
                         .successHandler(new LoginSuccessHandler())
                         .failureHandler(new LoginFailureHandler())
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/api/quests", true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated())
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/api/quests", true)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                );
+
+        return http.build();
+    }
+
+
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/h2-console/**").permitAll()
+//                        .requestMatchers("/api/signup", "/api/login").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .headers(headers -> headers
+//                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+//                )
+//                .formLogin(form -> form
+//                        .successHandler(new LoginSuccessHandler())
+//                        .failureHandler(new LoginFailureHandler())
+//                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .defaultSuccessUrl("/api/quests", true)
+//                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+//                        )
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
 }

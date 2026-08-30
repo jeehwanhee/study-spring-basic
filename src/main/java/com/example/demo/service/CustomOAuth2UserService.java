@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.config.CustomUserDetails;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,15 +29,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String userEmail = oAuth2User.getAttribute("email");
 
-        if (!userRepository.existsByUsername(userEmail)) {
-            User newUser = User.builder()
-                    .username(userEmail)
-                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                    .build();
-            userRepository.save(newUser);
-        }
+        User user = userRepository.findByUsername(userEmail)
+                .orElseGet(() ->
+                        userRepository.save(
+                                User.builder()
+                                        .username(userEmail)
+                                        .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                                        .build()
+                        )
+                );
 
-        return oAuth2User;
+        return new CustomUserDetails(user, oAuth2User.getAttributes());
     }
 
 }
