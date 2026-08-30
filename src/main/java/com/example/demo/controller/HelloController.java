@@ -6,6 +6,7 @@ import com.example.demo.dto.QuestRequest;
 import com.example.demo.dto.QuestResponse;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.QuestService;
+import com.example.demo.service.WeatherService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +19,12 @@ public class HelloController {
 
     private final QuestService questService;
     private final FileStorageService fileStorageService;
+    private final WeatherService weatherService;
 
-    public HelloController(QuestService questService, FileStorageService fileStorageService) {
+    public HelloController(QuestService questService, FileStorageService fileStorageService, WeatherService weatherService) {
         this.questService = questService;
         this.fileStorageService = fileStorageService;
+        this.weatherService = weatherService;
     }
 
 //    @GetMapping("/api/hello")
@@ -86,5 +89,11 @@ public class HelloController {
         String storedUrl = fileStorageService.store(file);
         questService.completeQuest(id, storedUrl);
         return id + " 완료 처리";
+    }
+
+    @GetMapping("/api/weather")
+    public String getWeather() {
+        double temperature = weatherService.getSeoulTemperature();
+        return "서울 현재 기온 : " + temperature;
     }
 }
