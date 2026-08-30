@@ -56,7 +56,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/api/quests", true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                );
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
